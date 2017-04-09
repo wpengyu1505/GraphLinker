@@ -26,19 +26,20 @@ class HashToMinLinker extends Serializable {
     var iterateCnt = 0
     var outClusters = clusters
     var changeCount = 1L
-    while (iterateCnt < iterations) {
+    while (iterateCnt < iterations && changeCount > 0) {
       var changeCnt = sc.accumulator(0L)
       var result = iterate(outClusters, changeCnt)
       outClusters = result
       iterateCnt += 1
       changeCount = changeCnt.value
+      
+      println("Iteration: " + iterateCnt + ": " + changeCount)
     }
-    
     outClusters
   }
   
   def iterate(cluster: RDD[Cluster], changeCnt: Accumulator[Long]) : RDD[Cluster] = {
-    cluster.flatMap(v => {
+    val out = cluster.flatMap(v => {
       val buffer = new ListBuffer[(String, Cluster)]
       
       val id = v.getId
@@ -56,7 +57,15 @@ class HashToMinLinker extends Serializable {
         })
       }
       buffer.toList
-    }).reduceByKey(mergeClusters(_, _)).map(_._2)
+    }).reduceByKey((a, b) => {
+      var c = mergeClusters(a, b)
+      if (!c.equals(a) || !c.equals(b)) {
+        changeCnt += 1
+      }
+      c
+    }).map(_._2)
+    out.count
+    out
   }
   
   def mergeClusters(c1: Cluster, c2: Cluster): Cluster = {
