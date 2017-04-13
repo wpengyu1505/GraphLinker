@@ -1,6 +1,7 @@
 package wpy.graphlinker
 
 import wpy.graphlinker.core.HashToMinLinker
+import wpy.graphlinker.core.BSPLinker
 
 object LinkRunner {
   
@@ -12,7 +13,7 @@ object LinkRunner {
     val input = args(0)
     val output = args(1)
     
-    val linker = new HashToMinLinker()
+    val linker = new BSPLinker()
     linker.link(input, output)
   }
 }

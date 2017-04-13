@@ -15,6 +15,7 @@ class HashToMinLinker extends Serializable {
   def link(inputFile: String, output: String) {
     val conf = new SparkConf().setAppName("Hash-To-Min Graph Linker").set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     val sc = new SparkContext(conf)
+    sc.setLogLevel("ERROR")
     val inputClusters = sc.textFile(inputFile).map(v => (new NodeParser()).getCluster(v))
     
     var graphFinal = resolveGraph(sc, inputClusters, 10)
