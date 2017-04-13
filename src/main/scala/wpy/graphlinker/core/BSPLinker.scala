@@ -130,14 +130,4 @@ class BSPLinker extends Serializable {
     updateNodeRDD.count
     updateNodeRDD
   }
-  
-  def mergeClusters(c1: Cluster, c2: Cluster): Cluster = {
-    val outCluster = c1;
-    if (c1.getId() == c2.getId()) {
-      c2.getNodeSet().foreach(v => {
-        c1.merge(v)
-      })
-    }
-    c1
-  }
 }
